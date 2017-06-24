@@ -10,6 +10,7 @@ const NumRows = 50
 const RowHeightPx = 20
 const NumColumns = 50
 const ColWidthPx = 20
+const HelpHeightPx = 100
 const GenerationTick = 16
 
 func main() {
@@ -18,23 +19,13 @@ func main() {
 	var dragging bool
 	var dragbtn uint8
 	var event sdl.Event
+	var ui UIState
 	var state GameState
-	state.Started = false
 
-	sdl.Init(sdl.INIT_EVERYTHING)
+	ui = CreateUI()
+	defer ui.Free()
 
-	window, err := sdl.CreateWindow("GoGOL - Go Game Of Life", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-		NumColumns*ColWidthPx, NumRows*RowHeightPx, sdl.WINDOW_SHOWN)
-	if err != nil {
-		panic(err)
-	}
-	defer window.Destroy()
-	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		panic(err)
-	}
-
-	draw(state.Current, renderer)
+	ui.draw(state)
 
 	dragging = false
 	running = true
@@ -47,6 +38,7 @@ func main() {
 			case *sdl.KeyDownEvent:
 				if t.Keysym.Sym == 32 {
 					state.Started = !state.Started
+					changed = true
 				}
 			case *sdl.MouseMotionEvent:
 				if !state.Started {
@@ -84,28 +76,10 @@ func main() {
 			changed = true
 		}
 		if changed {
-			draw(state.Current, renderer)
+			ui.draw(state)
 		}
 		sdl.Delay(GenerationTick)
 	}
 
-	sdl.Quit()
 	os.Exit(0)
-}
-
-func draw(state [NumRows][NumColumns]bool, renderer *sdl.Renderer) {
-	for i, row := range state {
-		for j, cell := range row {
-			rect := sdl.Rect{X: int32(j * ColWidthPx), Y: int32(i * RowHeightPx), W: int32(ColWidthPx), H: int32(RowHeightPx)}
-			if cell {
-				renderer.SetDrawColor(0, 0, 0, 255)
-			} else {
-				renderer.SetDrawColor(255, 255, 255, 255)
-			}
-			renderer.FillRect(&rect)
-			renderer.SetDrawColor(196, 196, 196, 255)
-			renderer.DrawRect(&rect)
-		}
-	}
-	renderer.Present()
 }
