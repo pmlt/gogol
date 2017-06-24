@@ -36,5 +36,5 @@ license.
 This program packages the
 [WhiteRabbit](http://www.dafont.com/white-rabbit.font) font by Matthew Welch.
 WhiteRabbit is distributed under the terms of the license found at
-[whitrabt_license.txt](whiterabbit_license.txt).
+[whitrabt_license.txt](whitrabt_license.txt).
 
