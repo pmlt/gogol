@@ -11,10 +11,6 @@ const RowHeightPx = 20
 const NumColumns = 50
 const ColWidthPx = 20
 const GenerationTick = 16
-const (
-	ColorAlive uint32 = 0x00000000
-	ColorDead  uint32 = 0xffffffff
-)
 
 func main() {
 	var running bool
@@ -33,8 +29,12 @@ func main() {
 		panic(err)
 	}
 	defer window.Destroy()
+	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
+	if err != nil {
+		panic(err)
+	}
 
-	draw(state.Current, window)
+	draw(state.Current, renderer)
 
 	dragging = false
 	running = true
@@ -84,7 +84,7 @@ func main() {
 			changed = true
 		}
 		if changed {
-			draw(state.Current, window)
+			draw(state.Current, renderer)
 		}
 		sdl.Delay(GenerationTick)
 	}
@@ -93,21 +93,19 @@ func main() {
 	os.Exit(0)
 }
 
-func draw(state [NumRows][NumColumns]bool, window *sdl.Window) {
-	surface, err := window.GetSurface()
-	if err != nil {
-		panic(err)
-	}
-
+func draw(state [NumRows][NumColumns]bool, renderer *sdl.Renderer) {
 	for i, row := range state {
 		for j, cell := range row {
 			rect := sdl.Rect{X: int32(j * ColWidthPx), Y: int32(i * RowHeightPx), W: int32(ColWidthPx), H: int32(RowHeightPx)}
-			color := ColorDead
 			if cell {
-				color = ColorAlive
+				renderer.SetDrawColor(0, 0, 0, 255)
+			} else {
+				renderer.SetDrawColor(255, 255, 255, 255)
 			}
-			surface.FillRect(&rect, color)
+			renderer.FillRect(&rect)
+			renderer.SetDrawColor(196, 196, 196, 255)
+			renderer.DrawRect(&rect)
 		}
 	}
-	window.UpdateSurface()
+	renderer.Present()
 }
