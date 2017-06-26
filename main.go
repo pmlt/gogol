@@ -44,7 +44,7 @@ func main() {
 				if !state.Started {
 					row := (t.Y / RowHeightPx)
 					col := (t.X / ColWidthPx)
-					if dragging {
+					if dragging && row >= 0 && row < NumRows && col >= 0 && col < NumColumns {
 						changed = state.Current[row][col] == (dragbtn != 1)
 						state.Current[row][col] = dragbtn == 1
 					}
@@ -64,8 +64,10 @@ func main() {
 							dragbtn = t.Button
 							row := (t.Y / RowHeightPx)
 							col := (t.X / ColWidthPx)
-							changed = state.Current[row][col] == (dragbtn != 1)
-							state.Current[row][col] = dragbtn == 1
+							if row >= 0 && row < NumRows && col >= 0 && col < NumColumns {
+								changed = state.Current[row][col] == (dragbtn != 1)
+								state.Current[row][col] = dragbtn == 1
+							}
 						}
 					}
 				}
